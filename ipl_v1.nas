@@ -36,13 +36,22 @@ entry:
 	MOV	CH,0
 	MOV	CL,2
 	MOV	DH,0
-
+	
+	MOV	SI,0
+retry:
 	MOV	AH,0x02
 	MOV	AL,1
 	MOV	BX,0
 	MOV	DL,0x00
 	INT	0x13
-	JC	error
+	JNC	fin		;jump if not carry flag
+	ADD	SI,1
+	CMP	SI,5
+	JAE	error		;jump if above or equal
+	MOV	AH,0x00		;将AH置空，方便retry是重新赋值为0x02
+	MOV	DL,0x00
+	INT	0x13
+	JMP	retry
 
 fin:
 	HLT
@@ -68,7 +77,3 @@ msg:
 RESB	0x7dfe-$
 
 	DB	0x55, 0xaa
-
-
-
-
