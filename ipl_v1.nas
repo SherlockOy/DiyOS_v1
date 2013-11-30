@@ -36,7 +36,8 @@ entry:
 	MOV	CH,0
 	MOV	CL,2
 	MOV	DH,0
-	
+
+readloop:	
 	MOV	SI,0
 retry:
 	MOV	AH,0x02
@@ -52,6 +53,14 @@ retry:
 	MOV	DL,0x00
 	INT	0x13
 	JMP	retry
+
+next:
+	MOV	AX,ES
+	ADD	AX,0x0020
+	MOV	ES,AX
+	ADD	CL,1
+	CMP	CL,18
+	JBE	readloop	;jump if below or equal
 
 fin:
 	HLT
