@@ -70,12 +70,11 @@ next:
 	JB	readloop	;如果小于，DH < 2,跳转回readloop，继续读，直到读取完反面磁头的18个扇区为止，读完之后DH的值会=2，不满足小于的条件，往下走。
 	MOV	DH,0		;把磁头号重新赋值为0，还原。
 	ADD	CH,1		;CH += 1，也就是柱面号。
-	CMP	CH1,CYLS	;对比柱面号和预设的10个柱面
+	CMP	CH,CYLS	;对比柱面号和预设的10个柱面
 	JB	readloop	;如果小于就继续读，每个柱面有18*2个扇区，10个柱面总共读入了360个扇区的数据，360*512字节=184320字节。
 
-fin:
-	HLT			;halt，使CPU进入休眠
-	JMP	fin
+	MOV	[0x0ff0],CH
+	JMP	0xc200
 
 error:
 	MOV	SI,msg		;为SI赋值，标号msg为一个地址	
@@ -88,6 +87,11 @@ putloop:
 	MOV	BX,15		;基址寄存器赋值为15，制定字符颜色
 	INT	0x10		;调用显卡BIOS
 	JMP	putloop
+fin:
+	HLT
+	JMP	fin
+
+
 msg:
 	DB	0x0a, 0x0a	;直接写入两个换行符
 	DB	"load error"	;读入装载错误的字符串
